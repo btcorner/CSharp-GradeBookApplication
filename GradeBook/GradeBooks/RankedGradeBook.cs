@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.InteropServices.WindowsRuntime;
 using System.Security.Cryptography.X509Certificates;
 using System.Text;
 using GradeBook.Enums;
@@ -16,23 +17,23 @@ namespace GradeBook.GradeBooks
         public override char GetLetterGrade(double averageGrade)
         {
             if (Students.Count < 5) throw new InvalidOperationException("Ranked-grading requires a minimum of 5 students to work");
-            double min = Students.Min(x => x.AverageGrade);
-            double max = Students.Max(x => x.AverageGrade);
-            double diff = max - min;
+            var gradeDiff = Students.Count / 5;
+            List<Student> SortedStudents = Students.OrderByDescending(x => x.AverageGrade).ToList();
+            int locationInList = SortedStudents.FindIndex(x => x.AverageGrade == averageGrade) + 1;
 
-            switch (averageGrade)
+            switch(locationInList)
             {
-                case double a when a >= (min + (diff * 0.8)):
+                case int l when l <= gradeDiff:
                     return 'A';
-                case double a when a >= (min + (diff * 0.6)):
+                case int l when l <= gradeDiff * 2:
                     return 'B';
-                case double a when a >= (min + (diff * 0.4)):
+                case int l when l <= gradeDiff * 3:
                     return 'C';
-                case double a when a >= (min + (diff * 0.2)):
+                case int l when l <= gradeDiff * 4:
                     return 'D';
                 default:
                     return 'F';
-            }
+            }    
         }
 
         public override void CalculateStatistics()
